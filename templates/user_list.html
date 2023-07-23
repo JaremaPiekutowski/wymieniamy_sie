@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Lista książek{% endblock %}
+
+{% block header %}
+<h1 class="text-center">Lista użytkowników</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <table class="table table-responsive table-striped">
+        <thead>
+        <tr>
+            <th><a href="?sort=user__username">Użytkownik</a></th>
+            <th><a href="?sort=book_count">Liczba dodanych książek</a></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.first_name }} {{ user.last_name }}</td>
+            <td>{{ user.book_count }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

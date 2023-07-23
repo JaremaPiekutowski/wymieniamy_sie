@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Lista książek{% endblock %}
+
+{% block header %}
+<h1 class="text-center">Lista książek</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <table class="table table-responsive table-striped">
+        <thead>
+        <tr>
+            <th><a href="?sort=title">Tytuł</a></th>
+            <th><a href="?sort=author">Autor</a></th>
+            <th><a href="?sort=genre">Gatunek</a></th>
+            <th><a href="?sort=user__first_name">Imię użytkownika</a></th>
+            <th><a href="?sort=user__last_name">Nazwisko użytkownika</a></th>
+            <th><a href="?sort=date_added">Data dodania</a></th>
+            <th>Recenzja</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.genre }}</td>
+            <td>{{ book.user.first_name }}</td>
+            <td>{{ book.user.last_name }}</td>
+            <td>{{ book.date_added|date:"d.m.Y" }}</td>
+            <td><a href="{{ book.review }}">LINK</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

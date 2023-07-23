@@ -1,0 +1,13 @@
+body {
+    background-color: #F5EFE7;
+    color: #213555;
+}
+
+.navbar {
+    background-color: #4F709C;
+    color: #F5EFE7;
+}
+
+.navbar-nav .nav-link {
+    color: #F5EFE7;
+}

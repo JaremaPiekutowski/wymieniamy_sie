@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Wymieniamy się książkami na K.{% endblock %}
+
+{% block header %}
+<h1 class="text-center">WYMIENIAMY SIĘ KSIĄŻKAMI NA K.</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <h2>Ostatnio dodane książki</h2>
+            <ul>
+                {% for book in last_submitted_books %}
+                <li>{{ book.title }} - {{ book.author }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-4">
+            <h2>Użytkownicy, którzy nie dodali żadnych książek w ostatnim półroczu</h2>
+            <ul class="text-danger">
+                <li>Helena Anna Jędrzejczak</li>
+                <li>Jarosław Kaczyński</li>
+                <li>Czesław Miłosz</li>
+            </ul>
+        </div>
+
+        <div class="col-md-4">
+            <h2>Użytkownicy, którzy dodali najwięcej</h2>
+            <ul>
+                <li>Lech Janerka</li>
+                <li>Wojciech Balas</li>
+                <li>Wisława Rusinek</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
