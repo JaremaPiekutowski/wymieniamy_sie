@@ -19,9 +19,7 @@ A book exchange application.
     pipenv shell
     ```
 
-2.  Configure your local database by filling out `DJANGO_DATABASE_URL` setting in `.env` file.
-
-    If there is no good reason to do otherwise, it should be a [Postgres](https://www.postgresql.org/) database since that's what we are using by default on production servers.
+2.  Configure your local database by filling out `DATABASES` setting in `settings.py` file.
 
 3.  Run database migrations:
 
