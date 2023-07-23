@@ -3,7 +3,8 @@
 - add book adding option/form
 - add users who didn't add any books (in the last halfyear!)
 - add users who added the most books (in the last halfyear!) 
-- deploy on Vercel (see if Firebase necessary)
+- deploy on Vercel (see if Firebase necessary) https://www.youtube.com/watch?v=I5x8lAVQ8QQ
 
 # TODO FOR V2
 - the table should be more responsive
+- add tests
