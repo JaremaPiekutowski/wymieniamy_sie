@@ -6,8 +6,28 @@ from .models import CustomUser
 
 # Create your views here.
 def user_list(request):
-    users = CustomUser.objects.all().annotate(book_count=Count('books'))
+    # Get the sort parameter from the request
+    sort_param = request.GET.get('sort', None)
+
+    # Define default sort
+    default_sort = 'book_count'
+
+    # Define valid sorting options
+    valid_sort_options = {
+        'last_name': 'last_name',
+        'book_count': '-book_count',
+    }
+
+    # Get the valid sort option from the request
+    sort_field = valid_sort_options.get(sort_param, default_sort)
+
+    # Get users with ordering by sort field
+    users = CustomUser.objects.all().annotate(book_count=Count('books')).order_by(sort_field)
+
+    # Define context
     context = {
         'users': users
         }
+
+    # Return the rendered template
     return render(request, 'user_list.html', context)

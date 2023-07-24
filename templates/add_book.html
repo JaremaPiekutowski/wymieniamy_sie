@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dodaj książkę{% endblock %}
+{% block header %}<h1 class="text-center">Dodaj książkę</h1>{% endblock %}
+{% block content %}
+<br>
+<div class="container">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+            <label for="{{ form.title.id_for_label }}" class="col-sm-2 col-form-label">Tytuł</label>
+            <div class="col-sm-10">
+                {{ form.title }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="{{ form.author.id_for_label }}" class="col-sm-2 col-form-label">Autor (NAJPIERW NAZWISKO)</label>
+            <div class="col-sm-10">
+                {{ form.author }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="{{ form.genre.id_for_label }}" class="col-sm-2 col-form-label">Gatunek</label>
+            <div class="col-sm-10">
+                {{ form.genre }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="{{ form.user.id_for_label }}" class="col-sm-2 col-form-label">Wrzucająca/y</label>
+            <div class="col-sm-10">
+                {{ form.user }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="{{ form.review.id_for_label }}" class="col-sm-2 col-form-label">Recenzja (www)</label>
+            <div class="col-sm-10">
+                {{ form.review }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">Dodaj</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
