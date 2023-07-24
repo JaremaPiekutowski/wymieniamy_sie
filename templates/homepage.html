@@ -19,20 +19,20 @@
         </div>
 
         <div class="col-md-4">
-            <h2>Użytkownicy, którzy nie dodali żadnych książek w ostatnim półroczu</h2>
+            <h2>Użytkownicy, którzy nie dodali żadnych książek w półroczu od {{ start_date }} do {{ end_date }}</h2>
             <ul class="text-danger">
-                <li>Helena Anna Jędrzejczak</li>
-                <li>Jarosław Kaczyński</li>
-                <li>Czesław Miłosz</li>
+                {% for user in users_with_no_books %}
+                <li>{{ user.first_name }} {{ user.last_name }}</li>
+                {% endfor %}
             </ul>
         </div>
 
         <div class="col-md-4">
-            <h2>Użytkownicy, którzy dodali najwięcej</h2>
+            <h2>Użytkownicy, którzy dodali najwięcej książek w półroczu od od {{ start_date }} do {{ end_date }}</h2>
             <ul>
-                <li>Lech Janerka</li>
-                <li>Wojciech Balas</li>
-                <li>Wisława Rusinek</li>
+                {% for user in users_with_most_books %}
+                <li>{{ user.first_name }} {{ user.last_name }} - {{ user.book_count }}</li>
+                {% endfor %}
             </ul>
         </div>
     </div>

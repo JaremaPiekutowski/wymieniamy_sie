@@ -1,16 +1,47 @@
+import datetime
 from django.contrib import messages
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 
 from .models import Book
+from ..users.models import CustomUser
 from .forms import BookForm
 
 
 # Create your views here.
 def homepage(request):
-    last_submitted_books = Book.objects.all().order_by('-date_added')[:3]
+    today = datetime.date.today()
+    current_month = today.month
+    current_year = today.year
+    if current_month <= 6:
+        start_date = datetime.datetime(current_year, 1, 1)
+        end_date = datetime.datetime(current_year, 6, 30)
+    else:
+        start_date = datetime.datetime(current_year, 7, 1)
+        end_date = datetime.datetime(current_year, 12, 31)
+
+    formatted_start_date = start_date.strftime('%d.%m')
+    formatted_end_date = end_date.strftime('%d.%m')
+
+    last_submitted_books = Book.objects.all().order_by('-date_added')[:5]
+
+    users_with_no_books = CustomUser.objects.exclude(
+        books__date_added__gte=start_date
+        )
+
+    users_with_most_books = CustomUser.objects.annotate(
+        book_count=Count('books', filter=Q(
+            books__date_added__gte=start_date
+            ))
+        ).order_by('-book_count')[:5]
+
     context = {
-        'last_submitted_books': last_submitted_books
-        }
+        'start_date': formatted_start_date,
+        'end_date': formatted_end_date,
+        'last_submitted_books': last_submitted_books,
+        'users_with_no_books': users_with_no_books,
+        'users_with_most_books': users_with_most_books,
+    }
 
     return render(request, 'homepage.html', context)
 
@@ -28,7 +59,9 @@ def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
-            form.save()
+            book = form.save(commit=False)
+            book.date_added = datetime.datetime.now()
+            book.save()
             title = form.cleaned_data.get('title')
             messages.success(request, f'Książka pt. "{title}" dodana.')
             return redirect('book_list')

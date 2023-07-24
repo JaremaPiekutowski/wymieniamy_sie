@@ -39,7 +39,11 @@
             <td>{{ book.user.first_name }}</td>
             <td>{{ book.user.last_name }}</td>
             <td>{{ book.date_added|date:"d.m.Y" }}</td>
-            <td><a href="{{ book.review }}">LINK</a></td>
+            <td>
+                {% if book.review %}
+                    <a href="{{ book.review }}">LINK</a>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
         </tbody>

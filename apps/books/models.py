@@ -32,7 +32,6 @@ class Book(models.Model):
     date_added = models.DateTimeField(
         null=True,
         blank=True,
-        auto_now_add=True,
         verbose_name="Data dodania",
     )
     review = models.URLField(
