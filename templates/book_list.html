@@ -9,6 +9,15 @@
 {% block content %}
 <div class="container">
     <br>
+    {% if messages %}
+    <div class="alert alert-success">
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
     <table class="table table-responsive table-striped">
         <thead>
         <tr>

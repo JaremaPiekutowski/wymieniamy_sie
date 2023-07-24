@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 
 from .models import Book
@@ -28,10 +29,12 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
+            title = form.cleaned_data.get('title')
+            messages.success(request, f'Książka pt. "{title}" dodana.')
             return redirect('book_list')
     else:
         form = BookForm()
-    
+
     context = {
         'form': form,
     }
