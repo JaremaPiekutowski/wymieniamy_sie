@@ -1,6 +1,10 @@
-from django.db.models import Count
-from django.shortcuts import render
+import locale
 
+from django.contrib import messages
+from django.db.models import Count
+from django.shortcuts import render, redirect
+
+from .forms import CustomUserForm
 from .models import CustomUser
 
 
@@ -22,7 +26,11 @@ def user_list(request):
     sort_field = valid_sort_options.get(sort_param, default_sort)
 
     # Get users with ordering by sort field
-    users = CustomUser.objects.all().annotate(book_count=Count('books')).order_by(sort_field)
+    users = CustomUser.objects.all().annotate(book_count=Count('books'))
+    if sort_param == 'last_name':
+        users = sorted(users, key=lambda u: locale.strxfrm(u.last_name))
+    else:
+        users = users.order_by(sort_field)
 
     # Define context
     context = {
@@ -31,3 +39,20 @@ def user_list(request):
 
     # Return the rendered template
     return render(request, 'user_list.html', context)
+
+
+def add_custom_user(request):
+    if request.method == 'POST':
+        form = CustomUserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+            messages.success(request, f'Użytkownik "{user}" dodany.')
+            return redirect('user_list')
+    else:
+        form = CustomUserForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'add_user.html', context)

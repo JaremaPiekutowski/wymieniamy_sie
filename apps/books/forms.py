@@ -1,5 +1,7 @@
 from django import forms
-from .models import Book
+from .models import Book, BookGenre
+
+from apps.users.models import CustomUser
 
 
 class BookForm(forms.ModelForm):
@@ -12,3 +14,9 @@ class BookForm(forms.ModelForm):
             'user',
             'review',
             ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['genre'].queryset = BookGenre.objects.order_by('name')
+        self.fields['user'].queryset = CustomUser.objects.order_by('last_name')
