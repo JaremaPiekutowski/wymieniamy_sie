@@ -8,6 +8,8 @@ django = "*"
 validators = "*"
 pandas = "*"
 openpyxl = "*"
+gunicorn = "*"
+python-dotenv = "*"
 
 [dev-packages]
 flake8 = "*"
