@@ -8,7 +8,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/wymieniamy_sie/wsgi.py"
+            "dest": "wymieniamy_sie/wsgi.py"
         }
     ]
 }
