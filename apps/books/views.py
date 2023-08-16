@@ -1,5 +1,6 @@
 import datetime
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 
@@ -49,8 +50,16 @@ def homepage(request):
 def book_list(request):
     sort_param = request.GET.get('sort', 'title')
     books = Book.objects.all().order_by(sort_param)
+
+    # Create a paginator object
+    paginator = Paginator(books, 15)
+
+    # Get the page number from the request
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'books': books
+        'page_obj': page_obj,
         }
     return render(request, 'book_list.html', context)
 
