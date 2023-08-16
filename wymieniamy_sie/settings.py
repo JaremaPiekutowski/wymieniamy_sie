@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'wymieniamy-atjap6wod-jaremapiekutowski.vercel.app',
+    '.vercel.app',
 ]
 
 
