@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 
 from .models import Book
 from ..users.models import CustomUser
-from .forms import BookForm
+from .forms import BookForm, BookSearchForm
 
 
 # Create your views here.
@@ -81,3 +81,49 @@ def add_book(request):
         'form': form,
     }
     return render(request, 'add_book.html', context)
+
+
+def book_search(request):
+    books = Book.objects.all()
+
+    # Add search functionality for Book model
+    if request.method == 'POST':
+        form = BookSearchForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            author = form.cleaned_data['author']
+            genre = form.cleaned_data['genre']
+            user = form.cleaned_data['user']
+
+            if title:
+                books = books.filter(title__icontains=title)
+            if author:
+                books = books.filter(author__icontains=author)
+            if genre:
+                books = books.filter(genre=genre)
+            if user:
+                books = books.filter(user=user)
+
+    else:
+        form = BookSearchForm()
+
+    sort_param = request.GET.get('sort', 'title')
+    if sort_param:
+        books = books.order_by(sort_param)
+
+    # Create a paginator object
+    paginator = Paginator(books, 10)
+
+    # Get the page number from the request
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'form': form,
+        'page_obj': page_obj,
+        }
+    return render(
+        request,
+        'search_book.html',
+        context
+        )

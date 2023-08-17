@@ -20,3 +20,20 @@ class BookForm(forms.ModelForm):
 
         self.fields['genre'].queryset = BookGenre.objects.order_by('name')
         self.fields['user'].queryset = CustomUser.objects.order_by('last_name')
+
+
+class BookSearchForm(forms.Form):
+    title = forms.CharField(required=False)
+    author = forms.CharField(required=False)
+    genre = forms.ModelChoiceField(
+        queryset=BookGenre.objects.order_by('name'),
+        required=False,
+        widget=forms.Select,
+        empty_label='Wybierz gatunek',
+    )
+    user = forms.ModelChoiceField(
+        queryset=CustomUser.objects.order_by('last_name'),
+        required=False,
+        widget=forms.Select,
+        empty_label='Wybierz użytkownika',
+    )
