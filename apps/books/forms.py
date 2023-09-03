@@ -19,7 +19,7 @@ class BookForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['genre'].queryset = BookGenre.objects.order_by('name')
-        self.fields['user'].queryset = CustomUser.objects.order_by('last_name')
+        self.fields['user'].queryset = CustomUser.objects.filter(active=True).order_by('last_name')
 
 
 class BookSearchForm(forms.Form):
@@ -32,7 +32,7 @@ class BookSearchForm(forms.Form):
         empty_label='Wybierz gatunek',
     )
     user = forms.ModelChoiceField(
-        queryset=CustomUser.objects.order_by('last_name'),
+        queryset=CustomUser.objects.filter(active=True).order_by('last_name'),
         required=False,
         widget=forms.Select,
         empty_label='Wybierz użytkownika',

@@ -39,20 +39,3 @@ def user_list(request):
 
     # Return the rendered template
     return render(request, 'user_list.html', context)
-
-
-def add_custom_user(request):
-    if request.method == 'POST':
-        form = CustomUserForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.save()
-            messages.success(request, f'Użytkownik "{user}" dodany.')
-            return redirect('user_list')
-    else:
-        form = CustomUserForm()
-
-    context = {
-        'form': form,
-    }
-    return render(request, 'add_user.html', context)

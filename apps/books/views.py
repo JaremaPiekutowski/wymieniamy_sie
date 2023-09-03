@@ -1,7 +1,7 @@
 import datetime
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Case, When, Value, BooleanField
 from django.shortcuts import render, redirect
 
 from .models import Book
@@ -22,15 +22,17 @@ def homepage(request):
         end_date = datetime.datetime(current_year, 12, 31)
 
     formatted_start_date = start_date.strftime('%d.%m')
-    formatted_end_date = end_date.strftime('%d.%m')
+    formatted_end_date = end_date.strftime('%d.%m.%y')
 
     last_submitted_books = Book.objects.all().order_by('-date_added')[:5]
 
-    users_with_no_books = CustomUser.objects.exclude(
+    active_users = CustomUser.objects.filter(active=True)
+
+    users_with_no_books = active_users.exclude(
         books__date_added__gte=start_date
         )
 
-    users_with_most_books = CustomUser.objects.annotate(
+    users_with_most_books = active_users.annotate(
         book_count=Count('books', filter=Q(
             books__date_added__gte=start_date
             ))
@@ -49,7 +51,16 @@ def homepage(request):
 
 def book_list(request):
     sort_param = request.GET.get('sort', 'title')
-    books = Book.objects.all().order_by(sort_param)
+    if sort_param == 'date_added':
+        books = Book.objects.annotate(
+            is_date_added_null=Case(
+                When(date_added__isnull=True, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
+        ).order_by('is_date_added_null', '-date_added')
+    else:
+        books = Book.objects.all().order_by(sort_param)
 
     paginator = Paginator(books, 15)
 

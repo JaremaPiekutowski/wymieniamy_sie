@@ -11,6 +11,10 @@ class CustomUser(models.Model):
         max_length=100,
         verbose_name="Nazwisko"
     )
+    active = models.BooleanField(
+        default=True,
+        verbose_name="Aktywny"
+    )
 
     def __str__(self):
         return self.first_name + " " + self.last_name

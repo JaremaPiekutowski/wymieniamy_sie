@@ -1,6 +1,8 @@
 # Wymieniamy się książkami
 
 A book exchange application.
+Database: https://railway.app/project/27bfa3e3-4e52-4f1a-addb-c8aadd49e57a
+Deployment environment: 
 
 ## Installation (local development)
 

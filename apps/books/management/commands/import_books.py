@@ -5,7 +5,6 @@ import pandas as pd
 import validators
 
 from django.db import transaction
-from django.db.models import Q
 from django.core.management.base import BaseCommand
 
 from apps.books.models import Book, BookGenre
@@ -43,11 +42,14 @@ class Command(BaseCommand):
             file_path = kwargs['file_path']
             df = pd.read_excel(file_path, parse_dates=['data'])
 
+            create_count = 0
+            update_count = 0
+
             for _, row in df.iterrows():
                 # Extract data from each row
                 title = str(row['tytuł'])
                 author = str(row['autor'])
-                genre = str(row['gatunek'])
+                genre_name = str(row['gatunek'])
                 user_name = str(row['wrzucająca/y'])
                 date_added = row['data']
                 review = str(row['recenzja'])
@@ -58,7 +60,7 @@ class Command(BaseCommand):
                     review = None
 
                 # Parse the genre
-                genre = self.parse_genre(genre)
+                genre_name = self.parse_genre(genre_name)
 
                 # Parse the user's first name and last name
                 first_name, last_name = self.parse_user_names(user_name)
@@ -66,35 +68,169 @@ class Command(BaseCommand):
                 # Parse the date
                 date_added = self.parse_date(date_added)
 
-                # Check if a book with the same author and title already exists
-                existing_book = Book.objects.filter(
-                    Q(title__iexact=title) & Q(author__iexact=author)
-                    ).first()
-
-                # If an existing book is found, skip the entry
-                if existing_book:
-                    self.stdout.write(self.style.WARNING(f"Book already exists: {title} by {author}. Skipping entry."))
-                    continue
-
-                # Find or create the user and genre
-                user, _ = CustomUser.objects.get_or_create(
+                # Find or create the user
+                # Check if any users with first_name and last_name already exist
+                user_duplicates = CustomUser.objects.filter(
                     first_name=first_name,
                     last_name=last_name,
-                    )
-                genre, _ = BookGenre.objects.get_or_create(name=genre)
+                )
+                # If there are duplicates, leave the first one and delete the rest
+                if user_duplicates.count() > 1:
+                    user_duplicates = user_duplicates[1:]
+                    user_duplicates.delete()
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Multiple users with name {first_name} {last_name} found. Using the first one."
+                            )
+                        )
+                    user = CustomUser.objects.get(
+                        first_name=first_name,
+                        last_name=last_name,
+                        )
 
-                # Create a new Book instance
-                book = Book(
+                elif user_duplicates.count() == 1:
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"User {first_name} {last_name} found."
+                            )
+                        )
+                    user = CustomUser.objects.get(
+                        first_name=first_name,
+                        last_name=last_name,
+                        )
+
+                else:
+                    user = CustomUser(
+                        first_name=first_name,
+                        last_name=last_name,
+                        active=True,
+                    )
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f'New user {first_name} {last_name} created.'
+                            )
+                        )
+                    # Save the instance to the database
+                    user.save()
+
+                # Find or create the genre
+                # Check if any genres with genre_name already exist
+                genre_duplicates = BookGenre.objects.filter(
+                    name=genre_name,
+                )
+                # If there are duplicates, leave the first one and delete the rest
+                if genre_duplicates.count() > 1:
+                    genre_duplicates = genre_duplicates[1:]
+                    genre_duplicates.delete()
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Multiple genres with name {genre_name} found. Using the first one."
+                            )
+                        )
+                    genre = BookGenre.objects.get(
+                        name=genre_name,
+                    )
+                elif genre_duplicates.count() == 1:
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Genre {genre_name} found."
+                            )
+                        )
+                    genre = BookGenre.objects.get(
+                        name=genre_name,
+                        )
+                else:
+                    genre = BookGenre(
+                        name=genre_name,
+                    )
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f'New genre {genre_name} created.'
+                            )
+                        )
+                    # Save the instance to the database
+                    genre.save()
+
+                # Find or create the book
+                # Check if any genres with genre_name already exist
+                book_duplicates = Book.objects.filter(
                     title=title,
                     author=author,
-                    genre=genre,
-                    user=user,
-                    date_added=date_added,
-                    review=review,
+                )
+                # If there are duplicates, leave the first one and delete the rest
+                if book_duplicates.count() > 1:
+                    book_duplicates = book_duplicates[1:]
+                    book_duplicates.delete()
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Multiple books with title {title} found. Using the first one."
+                            )
+                        )
+                    book = Book.objects.get(
+                        title=title,
+                        author=author,
+                        )
+                    created = False
+                elif book_duplicates.count() == 1:
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Book {title} found."
+                            )
+                        )
+                    book = Book.objects.get(
+                        title=title,
+                        author=author,
+                        )
+                    created = False
+                else:
+                    book = Book(
+                        title=title,
+                        author=author,
+                        genre=genre,
+                        user=user,
+                        date_added=date_added,
+                        review=review,
+                    )
+                    # Save the instance to the database
+                    book.save()
+                    created = True
+
+                # If the book already exists, update the necessary fields
+                if not created:
+                    updated = False
+                    if book.genre != genre:
+                        book.genre = genre
+                        updated = True
+                    if book.user != user:
+                        book.user = user
+                        updated = True
+                    if book.date_added != date_added:
+                        book.date_added = date_added
+                        updated = True
+                    if book.review != review:
+                        book.review = review
+                        updated = True
+
+                    if updated:
+                        book.save()
+                        update_count += 1
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f"Book {title} updated. Create count: {create_count}. Update count: {update_count}."
+                            )
+                        )
+                    continue
+
+                create_count += 1
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f'Book {title} created. Create count: {create_count}. Update count: {update_count}.'
+                    )
                 )
 
-                # Save the Book instance to the database
-                book.save()
-                self.stdout.write(self.style.SUCCESS(f'Book {title} created.'))
-
             self.stdout.write(self.style.SUCCESS('Data import completed.'))
+            self.stdout.write(self.style.SUCCESS(f'{create_count} books created. {update_count} books updated.'))
+            if user_duplicates:
+                self.stdout.write(self.style.WARNING(f"Duplicate users found:\n{user_duplicates}."))
+            if genre_duplicates:
+                self.stdout.write(self.style.WARNING(f"Duplicate genres found:\n{genre_duplicates}."))
