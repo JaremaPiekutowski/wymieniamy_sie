@@ -1,4 +1,6 @@
 import datetime
+import locale
+
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q, Case, When, Value, BooleanField
@@ -51,6 +53,7 @@ def homepage(request):
 
 def book_list(request):
     sort_param = request.GET.get('sort', 'title')
+
     if sort_param == 'date_added':
         books = Book.objects.annotate(
             is_date_added_null=Case(
@@ -60,7 +63,16 @@ def book_list(request):
             )
         ).order_by('is_date_added_null', '-date_added')
     else:
-        books = Book.objects.all().order_by(sort_param)
+        books = Book.objects.all()
+
+        if sort_param in ['author', 'title']:
+            books = sorted(books, key=lambda b: locale.strxfrm(getattr(b, sort_param)))
+        elif sort_param == 'user__last_name':
+            books = sorted(books, key=lambda b: locale.strxfrm(b.user.last_name) if b.user else '')
+        elif sort_param == 'user__first_name':
+            books = sorted(books, key=lambda b: locale.strxfrm(b.user.first_name) if b.user else '')
+        else:
+            books = books.order_by(sort_param)
 
     paginator = Paginator(books, 15)
 
@@ -69,7 +81,8 @@ def book_list(request):
 
     context = {
         'page_obj': page_obj,
-        }
+        'sort_param': sort_param,
+    }
     return render(request, 'book_list.html', context)
 
 

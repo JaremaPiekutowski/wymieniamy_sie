@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Lista książek{% endblock %}
+{% block title %}Lista aktywnych użytkowników{% endblock %}
 
 {% block header %}
-<h1 class="text-center">Lista użytkowników</h1>
+<h1 class="text-center">Lista aktywnych użytkowników</h1>
 {% endblock %}
 
 {% block content %}
@@ -14,6 +14,8 @@
         <tr>
             <th><a href="?sort=last_name">Użytkownik</a></th>
             <th><a href="?sort=book_count">Liczba dodanych książek</a></th>
+            <th>Liczba dodanych książek w tym półroczu</th>
+            <th>Liczba książek potrzebnych do dodania</th>
         </tr>
         </thead>
         <tbody>
@@ -21,6 +23,8 @@
         <tr>
             <td>{{ user.first_name }} {{ user.last_name }}</td>
             <td>{{ user.book_count }}</td>
+            <td>{{ user.books_this_half_year }}</td>
+            <td>{{ user.books_needed }}</td>
         </tr>
         {% endfor %}
         </tbody>

@@ -1,10 +1,9 @@
 import locale
 
-from django.contrib import messages
-from django.db.models import Count
-from django.shortcuts import render, redirect
+from datetime import date
+from django.db.models import Count, Case, When, Value, IntegerField
+from django.shortcuts import render
 
-from .forms import CustomUserForm
 from .models import CustomUser
 
 
@@ -14,7 +13,7 @@ def user_list(request):
     sort_param = request.GET.get('sort', None)
 
     # Define default sort
-    default_sort = 'book_count'
+    default_sort = '-book_count'
 
     # Define valid sorting options
     valid_sort_options = {
@@ -25,8 +24,33 @@ def user_list(request):
     # Get the valid sort option from the request
     sort_field = valid_sort_options.get(sort_param, default_sort)
 
+    # Get the current date
+    current_date = date.today()
+
+    # Determine the date range for the current half-year
+    if current_date.month <= 6:
+        start_date = date(current_date.year, 1, 1)
+        end_date = date(current_date.year, 6, 30)
+    else:
+        start_date = date(current_date.year, 7, 1)
+        end_date = date(current_date.year, 12, 31)
+
     # Get users with ordering by sort field
-    users = CustomUser.objects.all().annotate(book_count=Count('books'))
+    users = CustomUser.objects.filter(active=True).annotate(
+        book_count=Count('books'),
+        books_this_half_year=Count(
+            Case(
+                When(books__date_added__range=(start_date, end_date), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+        books_needed=Case(
+            When(books_this_half_year__gte=2, then=Value(0)),
+            When(books_this_half_year=1, then=Value(1)),
+            default=Value(2),
+            output_field=IntegerField(),
+            )
+        )
     if sort_param == 'last_name':
         users = sorted(users, key=lambda u: locale.strxfrm(u.last_name))
     else:
