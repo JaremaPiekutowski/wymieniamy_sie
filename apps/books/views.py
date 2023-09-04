@@ -33,7 +33,7 @@ def homepage(request):
 
     users_with_no_books = active_users.exclude(
         books__date_added__gte=start_date
-        )
+        ).order_by('last_name', 'first_name')
 
     users_with_most_books = active_users.annotate(
         book_count=Count('books', filter=Q(
@@ -139,6 +139,7 @@ def book_search(request):
     context = {
         'form': form,
         'page_obj': page_obj,
+        'sort_param': sort_param,
         }
     return render(
         request,

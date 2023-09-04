@@ -25,4 +25,4 @@ class Command(BaseCommand):
         df = pd.DataFrame(duplicate_rows)
 
         # Save the DataFrame to an Excel file
-        df.to_excel('duplicates.xlsx', index=False)
+        df.to_excel('data/duplicates.xlsx', index=False)

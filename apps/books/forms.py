@@ -35,5 +35,5 @@ class BookSearchForm(forms.Form):
         queryset=CustomUser.objects.filter(active=True).order_by('last_name'),
         required=False,
         widget=forms.Select,
-        empty_label='Wybierz użytkownika',
+        empty_label='Wybierz użytkownika/czkę',
     )
