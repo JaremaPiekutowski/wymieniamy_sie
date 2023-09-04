@@ -26,7 +26,8 @@ def homepage(request):
     formatted_start_date = start_date.strftime('%d.%m')
     formatted_end_date = end_date.strftime('%d.%m.%y')
 
-    last_submitted_books = Book.objects.all().order_by('-date_added')[:5]
+    # Filter only books whose date_added is not none and order by date added descending and get first 5
+    last_submitted_books = Book.objects.exclude(date_added__isnull=True).order_by('-date_added')[:5]
 
     active_users = CustomUser.objects.filter(active=True)
 
