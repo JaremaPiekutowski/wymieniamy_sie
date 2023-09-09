@@ -11,7 +11,7 @@ class Book(models.Model):
         null=True,
         blank=True,
         max_length=500,
-        verbose_name="Nazwisko i imię autora"
+        verbose_name="Nazwisko i imię autora/ki"
     )
     # Genre - foreign key to BookGenre
     genre = models.ForeignKey(
