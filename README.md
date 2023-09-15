@@ -8,7 +8,7 @@ Deployment environment:
 
 ### Prerequisites
 
-- [Python 3.11](https://www.python.org/)
+- [Python 3.9](https://www.python.org/)
 - [pipenv](https://pipenv.readthedocs.io/en/latest/)
 - SQLite or another database
 
