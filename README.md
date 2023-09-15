@@ -10,7 +10,7 @@ Deployment environment:
 
 - [Python 3.9](https://www.python.org/)
 - [pipenv](https://pipenv.readthedocs.io/en/latest/)
-- SQLite or another database
+- PostgreSQL database
 
 ### Installation instructions
 
