@@ -129,7 +129,15 @@ def book_search(request):
             books = books.filter(user=user)
 
     sort_param = request.GET.get('sort', 'title')
-    if sort_param:
+    if sort_param == 'date_added':
+        books = books.annotate(
+            is_date_added_null=Case(
+                When(date_added__isnull=True, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
+        ).order_by('is_date_added_null', '-date_added')
+    else:
         books = books.order_by(sort_param)
 
     paginator = Paginator(books, 10)

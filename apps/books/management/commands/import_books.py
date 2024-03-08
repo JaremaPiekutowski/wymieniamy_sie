@@ -15,7 +15,7 @@ class Command(BaseCommand):
     help = "Import data from an Excel file into the Book and CustomUser models."
 
     def add_arguments(self, parser):
-        parser.add_argument('file_path', type=str, help='Path to the Excel file.')
+        parser.add_argument('file_path', type=str, help='Path to the Excel file.', default='data/data.xlsx')
 
     def parse_genre(self, genre_str):
         genres = genre_str.split(',')
@@ -47,12 +47,12 @@ class Command(BaseCommand):
 
             for _, row in df.iterrows():
                 # Extract data from each row
-                title = str(row['tytuł'])
-                author = str(row['autor'])
-                genre_name = str(row['gatunek'])
-                user_name = str(row['wrzucająca/y'])
+                title = str(row['tytuł'])[:199]
+                author = str(row['autor'])[:199]
+                genre_name = str(row['gatunek'])[:199]
+                user_name = str(row['wrzucająca/y'])[:199]
                 date_added = row['data']
-                review = str(row['recenzja'])
+                review = str(row['recenzja'])[:199]
 
                 # Check if the review URL is valid
                 if review and not validators.url(review):
@@ -159,18 +159,24 @@ class Command(BaseCommand):
                 )
                 # If there are duplicates, leave the first one and delete the rest
                 if book_duplicates.count() > 1:
-                    book_duplicates = book_duplicates[1:]
-                    book_duplicates.delete()
+                    # Get the ID of the first book to keep
+                    first_book_id = book_duplicates.first().id
+
+                    # Exclude the first book and delete the rest
+                    book_duplicates.exclude(id=first_book_id).delete()
+
                     self.stdout.write(
                         self.style.WARNING(
                             f"Multiple books with title {title} found. Using the first one."
-                            )
                         )
-                    book = Book.objects.get(
+                    )
+
+                    # Get or create the book instance
+                    book, created = Book.objects.get_or_create(
                         title=title,
                         author=author,
-                        )
-                    created = False
+                    )
+
                 elif book_duplicates.count() == 1:
                     self.stdout.write(
                         self.style.SUCCESS(
