@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q, Case, When, Value, BooleanField
 from django.shortcuts import render, redirect
 
-from .models import Book
+from .models import Book, BookGenre
 from ..users.models import CustomUser
 from .forms import BookForm, BookSearchForm
 
@@ -91,12 +91,37 @@ def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
-            book = form.save(commit=False)
-            book.date_added = datetime.datetime.now()
-            book.save()
-            title = form.cleaned_data.get('title')
-            messages.success(request, f'Książka pt. "{title}" dodana.')
-            return redirect('book_list')
+            title = form.cleaned_data['title']
+            author = form.cleaned_data['author']
+            genre = form.cleaned_data['genre']
+            user = form.cleaned_data['user']
+            review = form.cleaned_data['review']
+            # Get genre object
+            if genre and genre != "Wybierz":
+                genre = BookGenre.objects.get(name=genre)
+            else:
+                genre = None
+            if user and user != "Wybierz":
+                user = CustomUser.objects.get(id=user)
+            else:
+                messages.error(request, f"Nie wybrano użytkownika.")
+                return redirect('add_book')
+            # See if no book of the same author and title exists
+            if Book.objects.filter(title=title, author=author).exists():
+                messages.error(request, f"Książka {title} {author} już istnieje.")
+                return redirect('add_book')
+            else:
+                book = Book(
+                    title=title,
+                    author=author,
+                    genre=genre,
+                    user=user,
+                    review=review,
+                )
+                book.save()
+                messages.success(request, f"Książka {title} {author} została dodana.")
+                return redirect('book_list')
+
     else:
         form = BookForm()
 
@@ -118,7 +143,7 @@ def book_search(request):
         user = form.cleaned_data['user']
 
         books = Book.objects.all()
-
+        print(title, author, genre, user)
         if title:
             books = books.filter(title__icontains=title)
         if author:
@@ -127,6 +152,10 @@ def book_search(request):
             books = books.filter(genre=genre)
         if user:
             books = books.filter(user=user)
+        if genre == "Wybierz" and user == "Wybierz" and not title and not author:
+            books = Book.objects.none()
+        if not genre and not user and not title and not author:
+            books = Book.objects.none()
 
     sort_param = request.GET.get('sort', 'title')
     if sort_param == 'date_added':

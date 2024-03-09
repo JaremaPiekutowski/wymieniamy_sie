@@ -11,6 +11,7 @@ openpyxl = "*"
 gunicorn = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
+whitenoise = "*"
 
 [dev-packages]
 flake8 = "*"
