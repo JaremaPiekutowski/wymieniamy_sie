@@ -1,8 +1,8 @@
 # Wymieniamy się książkami
 
 A book exchange application.
-Database: https://railway.app/project/27bfa3e3-4e52-4f1a-addb-c8aadd49e57a
-Deployment environment: 
+Database: https://console.neon.tech/app/projects/fragrant-rice-35415342
+Deployment environment: https://wymieniamy-sie.vercel.app/
 
 ## Installation (local development)
 
@@ -34,3 +34,15 @@ Deployment environment:
     ```
     python manage.py runserver
     ```
+
+### Cleaning and importing data
+
+Run scripts:
+
+```
+data/clean_data_books.ipynb
+```
+
+```
+python manage.py import_books
+```
