@@ -17,8 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.users.views import site_wide_login
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', site_wide_login, name='site_wide_login'),
     path('', include('apps.books.urls')),
     path('users/', include('apps.users.urls'))
 ]

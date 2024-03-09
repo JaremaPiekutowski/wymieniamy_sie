@@ -1,8 +1,11 @@
 import locale
 
 from datetime import date
+from django import forms
+from django.conf import settings
+from django.http import HttpResponse
 from django.db.models import Count, Case, When, Value, IntegerField
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .models import CustomUser
 
@@ -63,3 +66,21 @@ def user_list(request):
 
     # Return the rendered template
     return render(request, 'user_list.html', context)
+
+
+class SiteWideLoginForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+
+def site_wide_login(request):
+    if request.method == 'POST':
+        form = SiteWideLoginForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['password'] == settings.SITE_WIDE_PASSWORD:
+                request.session['authenticated'] = True
+                return redirect('/')
+            else:
+                return HttpResponse("Unauthorized", status=401)
+    else:
+        form = SiteWideLoginForm()
+    return render(request, 'site_wide_login.html', {'form': form})
