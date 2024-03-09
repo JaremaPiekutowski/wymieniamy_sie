@@ -1,39 +1,69 @@
+import locale
+
 from django import forms
+from django.db.models import Func
 from .models import Book, BookGenre
 
 from apps.users.models import CustomUser
 
 
-class BookForm(forms.ModelForm):
-    class Meta:
-        model = Book
-        fields = [
-            'title',
-            'author',
-            'genre',
-            'user',
-            'review',
-            ]
+class StrXfrm(Func):
+    function = 'STRXFRM'
+    template = '%(function)s(%(expressions)s)'
+
+
+class BookForm(forms.Form):
+    title = forms.CharField(required=True)
+    author = forms.CharField(required=False)
+    genre = forms.ChoiceField(
+        required=False,
+        widget=forms.Select,
+        choices=[],  # Initial empty choices
+    )
+    user = forms.ChoiceField(
+        required=True,
+        widget=forms.Select,
+        choices=[],  # Initial empty choices
+    )
+    review = forms.URLField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['genre'].queryset = BookGenre.objects.order_by('name')
-        self.fields['user'].queryset = CustomUser.objects.filter(active=True).order_by('last_name')
+        # Sort users and set choices manually
+        users = CustomUser.objects.filter(active=True)
+        users_sorted = sorted(users, key=lambda u: locale.strxfrm(u.last_name))
+        self.fields['user'].choices = [("", "Wybierz")]+[(u.id, u.first_name+" "+u.last_name) for u in users_sorted]
+
+        # Sort genres and set choices manually
+        genres = BookGenre.objects.all()
+        genres_sorted = sorted(genres, key=lambda g: locale.strxfrm(g.name))
+        self.fields['genre'].choices = [("", "Wybierz")]+[(g.id, g.name) for g in genres_sorted]
 
 
 class BookSearchForm(forms.Form):
     title = forms.CharField(required=False)
     author = forms.CharField(required=False)
-    genre = forms.ModelChoiceField(
-        queryset=BookGenre.objects.order_by('name'),
+    genre = forms.ChoiceField(
         required=False,
         widget=forms.Select,
-        empty_label='Wybierz gatunek',
+        choices=[],  # Initial empty choices
     )
-    user = forms.ModelChoiceField(
-        queryset=CustomUser.objects.filter(active=True).order_by('last_name'),
+    user = forms.ChoiceField(
         required=False,
         widget=forms.Select,
-        empty_label='Wybierz użytkownika/czkę',
+        choices=[],  # Initial empty choices
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Sort users and set choices manually
+        users = CustomUser.objects.filter(active=True)
+        users_sorted = sorted(users, key=lambda u: locale.strxfrm(u.last_name))
+        self.fields['user'].choices = [("", "Wybierz")]+[(u.id, u.first_name+" "+u.last_name) for u in users_sorted]
+
+        # Sort genres and set choices manually
+        genres = BookGenre.objects.all()
+        genres_sorted = sorted(genres, key=lambda g: locale.strxfrm(g.name))
+        self.fields['genre'].choices = [("", "Wybierz")]+[(g.id, g.name) for g in genres_sorted]
