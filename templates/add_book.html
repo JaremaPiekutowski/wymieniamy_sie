@@ -4,6 +4,15 @@
 {% block header %}<h1 class="text-center">Dodaj książkę</h1>{% endblock %}
 {% block content %}
 <br>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <p style="color: red; font-weight: bold;">
+                {{ message }}
+            </p>
+        </div>
+    {% endfor %}
+{% endif %}
 <p style="text-align: center;">Pola oznaczone gwiazdką (*) są obowiązkowe.</p>
 <div class="container">
     <form method="post">

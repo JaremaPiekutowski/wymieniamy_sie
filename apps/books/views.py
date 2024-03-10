@@ -96,20 +96,21 @@ def add_book(request):
             genre = form.cleaned_data['genre']
             user = form.cleaned_data['user']
             review = form.cleaned_data['review']
+            print("Genre: ", genre, "User: ", user)
             # Get genre object
             if genre and genre != "Wybierz":
-                genre = BookGenre.objects.get(name=genre)
+                genre = BookGenre.objects.get(id=genre)
             else:
                 genre = None
             if user and user != "Wybierz":
                 user = CustomUser.objects.get(id=user)
             else:
-                messages.error(request, f"Nie wybrano użytkownika.")
-                return redirect('add_book')
+                messages.error(request, "Nie wybrano użytkownika.")
+                return render(request, 'add_book.html', {'form': form})
             # See if no book of the same author and title exists
             if Book.objects.filter(title=title, author=author).exists():
-                messages.error(request, f"Książka {title} {author} już istnieje.")
-                return redirect('add_book')
+                messages.error(request, f'Książka "{title}" autora/ki {author} już istnieje.')
+                return render(request, 'add_book.html', {'form': form})
             else:
                 book = Book(
                     title=title,
