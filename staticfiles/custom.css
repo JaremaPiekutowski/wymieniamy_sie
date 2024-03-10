@@ -11,3 +11,13 @@ body {
 .navbar-nav .nav-link {
     color: #F5EFE7;
 }
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #f0ad4e; /* Default background color */
+    border-color: #eea236; /* Default border color */
+}
