@@ -117,9 +117,11 @@ def add_book(request):
                     author=author,
                     genre=genre,
                     user=user,
+                    date_added=datetime.datetime.now(),
                     review=review,
                 )
                 book.save()
+                print(f"The book {book.title} has been added.")
                 messages.success(request, f"Książka {title} {author} została dodana.")
                 return redirect('book_list')
 
