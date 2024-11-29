@@ -19,9 +19,9 @@
         </div>
 
         <div class="col-md-4">
-            <h2>Aktywni/e użytkownicy/czki, którzy nie dodali żadnych książek w półroczu od {{ start_date }} do {{ end_date }}</h2>
+            <h2>Aktywni/e użytkownicy/czki, którzy nie dodali dwóch książek w półroczu od {{ start_date }} do {{ end_date }}</h2>
             <ul class="text-danger">
-                {% for user in users_with_no_books %}
+                {% for user in users_with_less_than_two_books %}
                 <li>{{ user.first_name }} {{ user.last_name }}</li>
                 {% endfor %}
             </ul>

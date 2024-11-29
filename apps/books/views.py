@@ -31,9 +31,12 @@ def homepage(request):
 
     active_users = CustomUser.objects.filter(active=True)
 
-    users_with_no_books = active_users.exclude(
-        books__date_added__gte=start_date
-        ).order_by('last_name', 'first_name')
+    users_with_less_than_two_books = active_users.annotate(
+        book_count=Count('books', filter=Q(
+            books__date_added__gte=start_date,
+            books__date_added__lte=end_date
+        ))
+    ).filter(book_count__lt=2).order_by('last_name', 'first_name')
 
     users_with_most_books = active_users.annotate(
         book_count=Count('books', filter=Q(
@@ -45,7 +48,7 @@ def homepage(request):
         'start_date': formatted_start_date,
         'end_date': formatted_end_date,
         'last_submitted_books': last_submitted_books,
-        'users_with_no_books': users_with_no_books,
+        'users_with_less_than_two_books': users_with_less_than_two_books,
         'users_with_most_books': users_with_most_books,
     }
 
