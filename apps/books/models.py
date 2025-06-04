@@ -35,6 +35,7 @@ class Book(models.Model):
         verbose_name="Data dodania",
     )
     review = models.URLField(
+        max_length=1000,
         null=True,
         blank=True,
         verbose_name="Recenzja",
