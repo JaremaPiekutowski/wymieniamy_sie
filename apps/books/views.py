@@ -1,5 +1,4 @@
 import datetime
-import locale
 
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -16,18 +15,22 @@ def homepage(request):
     today = datetime.date.today()
     current_month = today.month
     current_year = today.year
+    next_year = current_year + 1
     if current_month <= 6:
         start_date = datetime.datetime(current_year, 1, 1)
-        end_date = datetime.datetime(current_year, 6, 30)
+        end_date = datetime.datetime(current_year, 7, 1)
     else:
         start_date = datetime.datetime(current_year, 7, 1)
-        end_date = datetime.datetime(current_year, 12, 31)
+        end_date = datetime.datetime(next_year, 1, 1)
 
     formatted_start_date = start_date.strftime('%d.%m')
     formatted_end_date = end_date.strftime('%d.%m.%y')
 
     # Filter only books whose date_added is not none and order by date added descending and get first 5
-    last_submitted_books = Book.objects.exclude(date_added__isnull=True).order_by('-date_added')[:5]
+    # Use select_related to fetch user data efficiently
+    last_submitted_books = Book.objects.select_related('user', 'genre').exclude(
+        date_added__isnull=True
+    ).order_by('-date_added')[:5]
 
     active_users = CustomUser.objects.filter(active=True)
 
@@ -58,25 +61,30 @@ def homepage(request):
 def book_list(request):
     sort_param = request.GET.get('sort', 'title')
 
+    # Use select_related to fetch related user and genre data in one query
+    books = Book.objects.select_related('user', 'genre')
+
     if sort_param == 'date_added':
-        books = Book.objects.annotate(
+        books = books.annotate(
             is_date_added_null=Case(
                 When(date_added__isnull=True, then=Value(True)),
                 default=Value(False),
                 output_field=BooleanField(),
             )
         ).order_by('is_date_added_null', '-date_added')
+    elif sort_param == 'author':
+        # Use database-level ordering with nulls_last for better performance
+        books = books.order_by('author', 'title')
+    elif sort_param == 'title':
+        books = books.order_by('title')
+    elif sort_param == 'user__last_name':
+        # Use database-level ordering with select_related
+        books = books.order_by('user__last_name', 'user__first_name', 'title')
+    elif sort_param == 'user__first_name':
+        books = books.order_by('user__first_name', 'user__last_name', 'title')
     else:
-        books = Book.objects.all()
-
-        if sort_param in ['author', 'title']:
-            books = sorted(books, key=lambda b: locale.strxfrm(getattr(b, sort_param)))
-        elif sort_param == 'user__last_name':
-            books = sorted(books, key=lambda b: locale.strxfrm(b.user.last_name) if b.user else '')
-        elif sort_param == 'user__first_name':
-            books = sorted(books, key=lambda b: locale.strxfrm(b.user.first_name) if b.user else '')
-        else:
-            books = books.order_by(sort_param)
+        # Fallback to database ordering
+        books = books.order_by(sort_param)
 
     paginator = Paginator(books, 15)
 
@@ -147,19 +155,25 @@ def book_search(request):
         genre = form.cleaned_data['genre']
         user = form.cleaned_data['user']
 
-        books = Book.objects.all()
-        print(title, author, genre, user)
+        # Start with select_related to fetch related data efficiently
+        books = Book.objects.select_related('user', 'genre')
+
+        # Build filters more efficiently
+        filters = Q()
         if title:
-            books = books.filter(title__icontains=title)
+            filters &= Q(title__icontains=title)
         if author:
-            books = books.filter(author__icontains=author)
-        if genre:
-            books = books.filter(genre=genre)
-        if user:
-            books = books.filter(user=user)
-        if genre == "Wybierz" and user == "Wybierz" and not title and not author:
-            books = Book.objects.none()
-        if not genre and not user and not title and not author:
+            filters &= Q(author__icontains=author)
+        if genre and genre != "Wybierz":
+            filters &= Q(genre_id=genre)
+        if user and user != "Wybierz":
+            filters &= Q(user_id=user)
+
+        # Apply all filters at once
+        if filters:
+            books = books.filter(filters)
+        else:
+            # If no valid filters, return empty queryset
             books = Book.objects.none()
 
     sort_param = request.GET.get('sort', 'title')
@@ -171,6 +185,14 @@ def book_search(request):
                 output_field=BooleanField(),
             )
         ).order_by('is_date_added_null', '-date_added')
+    elif sort_param == 'author':
+        books = books.order_by('author', 'title')
+    elif sort_param == 'title':
+        books = books.order_by('title')
+    elif sort_param == 'user__last_name':
+        books = books.order_by('user__last_name', 'user__first_name', 'title')
+    elif sort_param == 'user__first_name':
+        books = books.order_by('user__first_name', 'user__last_name', 'title')
     else:
         books = books.order_by(sort_param)
 

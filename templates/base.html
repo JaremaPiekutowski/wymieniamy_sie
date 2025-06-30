@@ -1,48 +1,503 @@
 {% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Wymieniamy się książkami{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <title>{% block title %} {% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Custom CSS -->
     <style>
+      :root {
+        --primary-color: #6366f1;
+        --primary-hover: #4f46e5;
+        --secondary-color: #f8fafc;
+        --accent-color: #f1f5f9;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        --border-color: #e2e8f0;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --radius: 0.75rem;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: #F5EFE7;
-        color: #213555;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        color: var(--text-primary);
+        line-height: 1.6;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
       }
+
+      .main-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header-section {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        padding: 2rem 0;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .header-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        text-align: center;
+        letter-spacing: -0.025em;
+      }
+
       .navbar {
-        background-color: #4F709C;
-        color: #F5EFE7;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
       }
-      .navbar-nav .nav-link {
-        color: #F5EFE7;
+      .navbar .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        padding: 0;
+      }
+      .navbar-nav {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding-left: 0;
+        margin-bottom: 0;
+        list-style: none;
+      }
+
+      .nav-item {
+        margin: 0 0.25rem;
+      }
+
+      .nav-link {
+        color: var(--text-primary) !important;
+        font-weight: 500;
+        padding: 0.75rem 1.25rem !important;
+        border-radius: var(--radius);
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+        transition: left 0.5s;
+      }
+
+      .nav-link:hover::before {
+        left: 100%;
+      }
+
+      .nav-link:hover {
+        color: var(--primary-color) !important;
+        background: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .nav-link.active {
+        background: var(--primary-color);
+        color: white !important;
+      }
+
+      .content-section {
+        flex: 1;
+        padding: 2rem 0;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .card {
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+      }
+
+      .card-header {
+        background: var(--accent-color);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      .table {
+        margin-bottom: 0;
+      }
+
+      .table th {
+        background: var(--accent-color);
+        border-bottom: 2px solid var(--border-color);
+        font-weight: 600;
+        color: var(--text-primary);
+        padding: 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+      }
+
+      .table tbody tr {
+        transition: background-color 0.2s ease;
+      }
+
+      .table tbody tr:hover {
+        background: rgba(99, 102, 241, 0.02);
+      }
+
+      .table-striped tbody tr:nth-of-type(odd) {
+        background: rgba(248, 250, 252, 0.5);
+      }
+
+      .btn {
+        border-radius: var(--radius);
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-hover) 0%, #4338ca 100%);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: var(--accent-color);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-secondary:hover {
+        background: var(--border-color);
+        color: var(--text-primary);
+      }
+
+      .form-control {
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: white;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        outline: none;
+      }
+
+      .form-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .alert {
+        border-radius: var(--radius);
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+      }
+
+      .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+      }
+
+      .pagination {
+        gap: 0.25rem;
+        margin-top: 2rem;
+      }
+
+      .page-link {
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .page-link:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .text-danger {
+        color: var(--danger-color) !important;
+      }
+
+      .text-success {
+        color: var(--success-color) !important;
+      }
+
+      .mb-4 {
+        margin-bottom: 1.5rem;
+      }
+
+      .mt-4 {
+        margin-top: 1.5rem;
+      }
+
+      .py-4 {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .header-title {
+          font-size: 2rem;
+        }
+
+        .navbar-nav {
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .nav-item {
+          width: 100%;
+        }
+
+        .nav-link {
+          justify-content: center;
+        }
+
+        .table-responsive {
+          font-size: 0.875rem;
+        }
+
+        .table th,
+        .table td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+
+      /* Loading animation */
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--accent-color);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
       }
     </style>
   </head>
   <body>
-    {% block header %} {% endblock %}
-    <nav class="navbar navbar-expand-lg justify-content-center">
-      <ul class="navbar-nav mr-auto">
-          <li class="nav-item px-3">
-              <a class="nav-link" href="{% url 'homepage' %}">Strona główna</a>
-          <li class="nav-item px-3">
-              <a class="nav-link" href="{% url 'book_list' %}">Książki</a>
-          </li>
-          <li class="nav-item px-3">
-            <a class="nav-link" href="{% url 'book_search' %}">Szukaj książki</a>
-          </li>
-          <li class="nav-item px-3">
-            <a class="nav-link" href="{% url 'add_book' %}">Dodaj książkę</a>
-          </li>
-          <li class="nav-item px-3">
-              <a class="nav-link" href="{% url 'user_list' %}">Użytkownicy/czki</a>
-          </li>
-      </ul>
-    </nav>
-    {% block content %} {% endblock %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <div class="main-container">
+      {% block header %}
+      <div class="header-section">
+        <div class="container">
+          <div class="header-content">
+            <h1 class="header-title">
+              <i class="fas fa-book-open me-3"></i>
+              {% block header_title %}Wymieniamy się książkami{% endblock %}
+            </h1>
+          </div>
+        </div>
+      </div>
+      {% endblock %}
+
+      <nav class="navbar">
+        <div class="container">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'homepage' %}">
+                <i class="fas fa-home"></i>
+                Strona główna
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'book_list' %}">
+                <i class="fas fa-books"></i>
+                Książki
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'book_search' %}">
+                <i class="fas fa-search"></i>
+                Szukaj książki
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'add_book' %}">
+                <i class="fas fa-plus"></i>
+                Dodaj książkę
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'user_list' %}">
+                <i class="fas fa-users"></i>
+                Użytkownicy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <main class="content-section">
+        <div class="container">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+      // Add active class to current nav item
+      document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

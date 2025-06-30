@@ -2,75 +2,154 @@
 
 {% block title %}Lista książek{% endblock %}
 
-{% block header %}
-<h1 class="text-center">Lista książek</h1>
-{% endblock %}
+{% block header_title %}Lista książek{% endblock %}
 
 {% block content %}
-<div class="container">
-    <br>
+<div class="card">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="fas fa-books text-primary me-2"></i>
+        Wszystkie książki
+      </h5>
+      <div class="d-flex gap-2">
+        <a href="{% url 'add_book' %}" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus me-1"></i>
+          Dodaj książkę
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
     {% if messages %}
-    <div class="alert alert-success">
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+    <div class="alert alert-success m-3">
+      <ul class="mb-0">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
     </div>
     {% endif %}
-    <table class="table table-responsive table-striped">
+
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
         <thead>
-        <tr>
-            <th><a href="?sort=title">Tytuł</a></th>
-            <th><a href="?sort=author">Autor/ka</a></th>
-            <th><a href="?sort=genre">Gatunek</a></th>
-            <th>Imię użytkownika/czki</th>
-            <th>Nazwisko użytkownika/czki</th>
-            <th><a href="?sort=date_added">Data dodania</a></th>
+          <tr>
+            <th>
+              <a href="?sort=title" class="text-decoration-none text-dark">
+                <i class="fas fa-sort me-1"></i>Tytuł
+              </a>
+            </th>
+            <th>
+              <a href="?sort=author" class="text-decoration-none text-dark">
+                <i class="fas fa-sort me-1"></i>Autor/ka
+              </a>
+            </th>
+            <th>
+              <a href="?sort=genre" class="text-decoration-none text-dark">
+                <i class="fas fa-sort me-1"></i>Gatunek
+              </a>
+            </th>
+            <th>Użytkownik</th>
+            <th>
+              <a href="?sort=date_added" class="text-decoration-none text-dark">
+                <i class="fas fa-sort me-1"></i>Data dodania
+              </a>
+            </th>
             <th>Recenzja</th>
-        </tr>
+          </tr>
         </thead>
         <tbody>
-        {% for book in page_obj %}
-        <tr>
-            <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.genre }}</td>
-            <td>{{ book.user.first_name }}</td>
-            <td>{{ book.user.last_name }}</td>
-            <td>{{ book.date_added|date:"d.m.Y" }}</td>
+          {% for book in page_obj %}
+          <tr>
             <td>
-                {% if book.review %}
-                    <a href="{{ book.review }}">LINK</a>
-                {% endif %}
+              <div class="d-flex align-items-center">
+                <i class="fas fa-book text-primary me-2"></i>
+                <strong>{{ book.title }}</strong>
+              </div>
             </td>
-        </tr>
-        {% endfor %}
+            <td>{{ book.author }}</td>
+            <td>
+              {% if book.genre %}
+                <span class="badge bg-secondary">{{ book.genre }}</span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-user text-muted me-2"></i>
+                <span>{{ book.user.first_name }} {{ book.user.last_name }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="text-muted">{{ book.date_added|date:"d.m.Y" }}</span>
+            </td>
+            <td>
+              {% if book.review %}
+                <a href="{{ book.review }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                  <i class="fas fa-external-link-alt me-1"></i>
+                  Link
+                </a>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">Brak książek do wyświetlenia.</p>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
-    <!-- Pagination controls -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <li class="page-item">
-                <a class="page-link" href="?page=1&sort={{ sort_param }}">Pierwsza</a>
-            </li>
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ sort_param }}">Poprzednia</a>
-                </li>
-            {% endif %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.number }}&sort={{ sort_param }}">Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}</a>
-            </li>
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ sort_param }}">Następna</a>
-                </li>
-            {% endif %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_param }}">Ostatnia</a>
-            </li>
-        </ul>
-    </nav>    
+      </table>
+    </div>
+  </div>
 </div>
+
+{% if page_obj.has_other_pages %}
+<div class="card mt-4">
+  <div class="card-body">
+    <nav aria-label="Nawigacja stron">
+      <ul class="pagination justify-content-center mb-0">
+        <li class="page-item">
+          <a class="page-link" href="?page=1&sort={{ sort_param }}">
+            <i class="fas fa-angle-double-left"></i>
+          </a>
+        </li>
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ sort_param }}">
+              <i class="fas fa-angle-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        <li class="page-item active">
+          <span class="page-link">
+            Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ sort_param }}">
+              <i class="fas fa-angle-right"></i>
+            </a>
+          </li>
+        {% endif %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_param }}">
+            <i class="fas fa-angle-double-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

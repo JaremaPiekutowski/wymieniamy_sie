@@ -2,39 +2,114 @@
 
 {% block title %}Wymieniamy się książkami na K.{% endblock %}
 
-{% block header %}
-<h1 class="text-center">WYMIENIAMY SIĘ KSIĄŻKAMI NA K.</h1>
-{% endblock %}
+{% block header_title %}WYMIENIAMY SIĘ KSIĄŻKAMI NA K.{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <h2>Ostatnio dodane książki</h2>
-            <ul>
-                {% for book in last_submitted_books %}
-                <li>{{ book.title }} - {{ book.author }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="col-md-4">
-            <h2>Aktywni/e użytkownicy/czki, którzy nie dodali dwóch książek w półroczu od {{ start_date }} do {{ end_date }}</h2>
-            <ul class="text-danger">
-                {% for user in users_with_less_than_two_books %}
-                <li>{{ user.first_name }} {{ user.last_name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="col-md-4">
-            <h2>Użytkownicy/czki, którzy dodali najwięcej książek w półroczu od {{ start_date }} do {{ end_date }}</h2>
-            <ul>
-                {% for user in users_with_most_books %}
-                <li>{{ user.first_name }} {{ user.last_name }} - {{ user.book_count }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-clock text-primary me-2"></i>
+          Ostatnio dodane książki
+        </h5>
+      </div>
+      <div class="card-body">
+        {% if last_submitted_books %}
+          <div class="list-group list-group-flush">
+            {% for book in last_submitted_books %}
+            <div class="list-group-item border-0 px-0 py-2">
+              <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-book text-muted"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="mb-1">{{ book.title }}</h6>
+                  <p class="text-muted mb-0 small">{{ book.author }}</p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Brak ostatnio dodanych książek.</p>
+        {% endif %}
+      </div>
     </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card h-100 border-warning">
+      <div class="card-header bg-warning bg-opacity-10">
+        <h5 class="mb-0 text-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Zalegają
+        </h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">
+          Aktywni użytkownicy, którzy nie dodali dwóch książek w półroczu od {{ start_date }} do {{ end_date }}
+        </p>
+        {% if users_with_less_than_two_books %}
+          <div class="list-group list-group-flush">
+            {% for user in users_with_less_than_two_books %}
+            <div class="list-group-item border-0 px-0 py-2">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-user text-danger"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <span class="text-danger">{{ user.first_name }} {{ user.last_name }}</span>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-3">
+            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+            <p class="text-success mb-0">Wszyscy użytkownicy spełniają wymagania!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card h-100 border-success">
+      <div class="card-header bg-success bg-opacity-10">
+        <h5 class="mb-0 text-success">
+          <i class="fas fa-trophy me-2"></i>
+          Najbardziej aktywni
+        </h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">
+          Użytkownicy, którzy dodali najwięcej książek w półroczu od {{ start_date }} do {{ end_date }}
+        </p>
+        {% if users_with_most_books %}
+          <div class="list-group list-group-flush">
+            {% for user in users_with_most_books %}
+            <div class="list-group-item border-0 px-0 py-2">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <i class="fas fa-user text-success"></i>
+                  </div>
+                  <div class="flex-grow-1 ms-3">
+                    <span>{{ user.first_name }} {{ user.last_name }}</span>
+                  </div>
+                </div>
+                <span class="badge bg-success rounded-pill">{{ user.book_count }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Brak danych o aktywności użytkowników.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

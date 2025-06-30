@@ -1,57 +1,173 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}Dodaj książkę{% endblock %}
-{% block header %}<h1 class="text-center">Dodaj książkę</h1>{% endblock %}
+
+{% block header_title %}Dodaj książkę{% endblock %}
+
 {% block content %}
-<br>
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            <p style="color: red; font-weight: bold;">
-                {{ message }}
-            </p>
-        </div>
-    {% endfor %}
-{% endif %}
-<p style="text-align: center;">Pola oznaczone gwiazdką (*) są obowiązkowe.</p>
-<div class="container">
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group row">
-            <label for="{{ form.title.id_for_label }}" class="col-sm-2 col-form-label">Tytuł *</label>
-            <div class="col-sm-10">
-                {{ form.title }}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-plus text-primary me-2"></i>
+          Dodaj nową książkę
+        </h5>
+      </div>
+
+      <div class="card-body">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              {{ message }}
             </div>
+          {% endfor %}
+        {% endif %}
+
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          Pola oznaczone gwiazdką (*) są obowiązkowe.
         </div>
-        <div class="form-group row">
-            <label for="{{ form.author.id_for_label }}" class="col-sm-2 col-form-label">Autor/ka (NAJPIERW NAZWISKO)</label>
-            <div class="col-sm-10">
-                {{ form.author }}
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="{{ form.title.id_for_label }}" class="form-label">
+                <i class="fas fa-book me-1"></i>
+                Tytuł *
+              </label>
+              {{ form.title }}
+              {% if form.title.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.title.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
-        </div>
-        <div class="form-group row">
-            <label for="{{ form.genre.id_for_label }}" class="col-sm-2 col-form-label">Gatunek</label>
-            <div class="col-sm-10">
-                {{ form.genre }}
+
+            <div class="col-12">
+              <label for="{{ form.author.id_for_label }}" class="form-label">
+                <i class="fas fa-user me-1"></i>
+                Autor/ka (NAJPIERW NAZWISKO)
+              </label>
+              {{ form.author }}
+              {% if form.author.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.author.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
-        </div>
-        <div class="form-group row">
-            <label for="{{ form.user.id_for_label }}" class="col-sm-2 col-form-label">Wrzucająca/y</label>
-            <div class="col-sm-10">
-                {{ form.user }}
+
+            <div class="col-md-6">
+              <label for="{{ form.genre.id_for_label }}" class="form-label">
+                <i class="fas fa-tags me-1"></i>
+                Gatunek
+              </label>
+              {{ form.genre }}
+              {% if form.genre.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.genre.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
-        </div>
-        <div class="form-group row">
-            <label for="{{ form.review.id_for_label }}" class="col-sm-2 col-form-label">Recenzja (link do www)</label>
-            <div class="col-sm-10">
-                {{ form.review }}
+
+            <div class="col-md-6">
+              <label for="{{ form.user.id_for_label }}" class="form-label">
+                <i class="fas fa-user-plus me-1"></i>
+                Wrzucająca/y
+              </label>
+              {{ form.user }}
+              {% if form.user.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.user.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary">Dodaj</button>
+
+            <div class="col-12">
+              <label for="{{ form.review.id_for_label }}" class="form-label">
+                <i class="fas fa-link me-1"></i>
+                Recenzja (link do www)
+              </label>
+              {{ form.review }}
+              {% if form.review.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.review.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
-        </div>
-    </form>
+
+            <div class="col-12">
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-1"></i>
+                  Dodaj książkę
+                </button>
+                <a href="{% url 'book_list' %}" class="btn btn-secondary">
+                  <i class="fas fa-arrow-left me-1"></i>
+                  Powrót do listy
+                </a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+<style>
+  .form-control {
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    outline: none;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .alert {
+    border-radius: var(--radius);
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+    border-left: 4px solid #3b82f6;
+  }
+
+  .alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+    border-left: 4px solid var(--danger-color);
+  }
+</style>
 {% endblock %}

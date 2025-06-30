@@ -1,13 +1,4 @@
-body {
-    background-color: #F5EFE7;
-    color: #213555;
-}
+/* Modern design system - all styles are now in base.html */
+/* This file is kept for any future custom styles that might be needed */
 
-.navbar {
-    background-color: #4F709C;
-    color: #F5EFE7;
-}
-
-.navbar-nav .nav-link {
-    color: #F5EFE7;
-}
+/* Additional custom styles can be added here if needed */

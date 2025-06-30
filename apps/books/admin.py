@@ -4,8 +4,8 @@ from .models import Book, BookGenre
 
 
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'date_added')
-    list_filter = ('date_added',)
+    list_display = ('title', 'author', 'date_added', 'user')
+    list_filter = ('date_added', 'user')
     ordering = ('date_added',)
     search_fields = ('title', 'author')
 

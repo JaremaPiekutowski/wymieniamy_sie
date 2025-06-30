@@ -29,14 +29,16 @@ def user_list(request):
 
     # Get the current date
     current_date = date.today()
+    current_year = current_date.year
+    next_year = current_year + 1
 
     # Determine the date range for the current half-year
     if current_date.month <= 6:
         start_date = date(current_date.year, 1, 1)
-        end_date = date(current_date.year, 6, 30)
+        end_date = date(current_date.year, 7, 1)
     else:
         start_date = date(current_date.year, 7, 1)
-        end_date = date(current_date.year, 12, 31)
+        end_date = date(next_year, 1, 1)
 
     # Get users with ordering by sort field
     users = CustomUser.objects.filter(active=True).annotate(

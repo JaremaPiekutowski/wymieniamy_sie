@@ -5,13 +5,15 @@ from django.db import models
 class Book(models.Model):
     title = models.CharField(
         max_length=500,
-        verbose_name="Tytuł"
+        verbose_name="Tytuł",
+        db_index=True  # Add index for title searches
         )
     author = models.CharField(
         null=True,
         blank=True,
         max_length=500,
-        verbose_name="Nazwisko i imię autora/ki"
+        verbose_name="Nazwisko i imię autora/ki",
+        db_index=True  # Add index for author searches
     )
     # Genre - foreign key to BookGenre
     genre = models.ForeignKey(
@@ -33,6 +35,7 @@ class Book(models.Model):
         null=True,
         blank=True,
         verbose_name="Data dodania",
+        db_index=True  # Add index for date sorting and filtering
     )
     review = models.URLField(
         max_length=1000,
@@ -41,6 +44,12 @@ class Book(models.Model):
         verbose_name="Recenzja",
     )
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['title', 'author']),  # Composite index for title+author lookups
+            models.Index(fields=['-date_added']),  # Index for reverse date ordering
+        ]
+
     def __str__(self):
         return self.title
 
@@ -48,7 +57,8 @@ class Book(models.Model):
 class BookGenre(models.Model):
     name = models.CharField(
         max_length=500,
-        verbose_name="Gatunek"
+        verbose_name="Gatunek",
+        db_index=True  # Add index for genre name lookups
     )
 
     def __str__(self):

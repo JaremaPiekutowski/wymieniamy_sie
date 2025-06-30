@@ -1,33 +1,136 @@
 {% extends "base.html" %}
 
-{% block title %}Lista aktywnych użytkowników/czek{% endblock %}
+{% block title %}Lista aktywnych użytkowników{% endblock %}
 
-{% block header %}
-<h1 class="text-center">Lista aktywnych użytkowników/czek</h1>
-{% endblock %}
+{% block header_title %}Lista aktywnych użytkowników{% endblock %}
 
 {% block content %}
-<div class="container">
-    <br>
-    <table class="table table-responsive table-striped">
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <i class="fas fa-users text-primary me-2"></i>
+      Aktywni użytkownicy
+    </h5>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
         <thead>
-        <tr>
-            <th><a href="?sort=last_name">Użytkownik/czka</a></th>
-            <th><a href="?sort=book_count">Liczba dodanych książek</a></th>
-            <th>Liczba dodanych książek w tym półroczu</th>
-            <th>Liczba książek potrzebnych do dodania</th>
-        </tr>
+          <tr>
+            <th>
+              <a href="?sort=last_name" class="text-decoration-none text-dark">
+                <i class="fas fa-sort me-1"></i>Użytkownik
+              </a>
+            </th>
+            <th>
+              <a href="?sort=book_count" class="text-decoration-none text-dark">
+                <i class="fas fa-sort me-1"></i>Liczba książek
+              </a>
+            </th>
+            <th>Książki w tym półroczu</th>
+            <th>Status</th>
+          </tr>
         </thead>
         <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.first_name }} {{ user.last_name }}</td>
-            <td>{{ user.book_count }}</td>
-            <td>{{ user.books_this_half_year }}</td>
-            <td>{{ user.books_needed }}</td>
-        </tr>
-        {% endfor %}
+          {% for user in users %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  {% if user.books_needed == 0 %}
+                    <i class="fas fa-user-check text-success"></i>
+                  {% elif user.books_needed == 1 %}
+                    <i class="fas fa-user-clock text-warning"></i>
+                  {% else %}
+                    <i class="fas fa-user-times text-danger"></i>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-primary">{{ user.book_count }}</span>
+            </td>
+            <td>
+              <span class="badge bg-secondary">{{ user.books_this_half_year }}</span>
+            </td>
+            <td>
+              {% if user.books_needed == 0 %}
+                <span class="badge bg-success">
+                  <i class="fas fa-check me-1"></i>
+                  Wymagania spełnione
+                </span>
+              {% elif user.books_needed == 1 %}
+                <span class="badge bg-warning">
+                  <i class="fas fa-exclamation me-1"></i>
+                  Potrzebuje 1 książki
+                </span>
+              {% else %}
+                <span class="badge bg-danger">
+                  <i class="fas fa-times me-1"></i>
+                  Potrzebuje {{ user.books_needed }} książek
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center py-4">
+              <i class="fas fa-users fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">Brak aktywnych użytkowników.</p>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-4">
+    <div class="card border-success">
+      <div class="card-body text-center">
+        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-1">
+          {{ users|length|add:"-1"|default:0 }}
+        </h4>
+        <p class="text-muted mb-0">Użytkownicy spełniający wymagania</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-warning">
+      <div class="card-body text-center">
+        <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-1">
+          {% for user in users %}
+            {% if user.books_needed == 1 %}
+              {{ forloop.counter }}
+            {% endif %}
+          {% endfor %}
+        </h4>
+        <p class="text-muted mb-0">Potrzebuje 1 książki</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-danger">
+      <div class="card-body text-center">
+        <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-1">
+          {% for user in users %}
+            {% if user.books_needed >= 2 %}
+              {{ forloop.counter }}
+            {% endif %}
+          {% endfor %}
+        </h4>
+        <p class="text-muted mb-0">Potrzebuje 2+ książek</p>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
